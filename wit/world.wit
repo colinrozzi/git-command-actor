@@ -1,0 +1,9 @@
+package colinrozzi:git-command-actor;
+
+world default {
+  import theater:simple/runtime;
+  import theater:simple/process;
+
+  export theater:simple/actor;
+  export theater:simple/process-handlers;
+}

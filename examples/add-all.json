@@ -1,0 +1,5 @@
+{
+  "repository_path": "/path/to/repo",
+  "git_args": ["add", "."],
+  "timeout_seconds": 30
+}

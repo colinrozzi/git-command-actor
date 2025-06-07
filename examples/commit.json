@@ -1,0 +1,5 @@
+{
+  "repository_path": "/path/to/repo",
+  "git_args": ["commit", "-m", "Automated commit via git-command-actor"],
+  "timeout_seconds": 30
+}
