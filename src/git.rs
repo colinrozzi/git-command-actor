@@ -5,18 +5,11 @@ use std::path::Path;
 use std::time::SystemTime;
 
 pub fn validate_repository(path: &str) -> Result<(), String> {
-    // Check if the path exists
-    if !Path::new(path).exists() {
-        return Err(format!("Repository path does not exist: {}", path));
-    }
-
-    // Check if it's a directory
-    if !Path::new(path).is_dir() {
-        return Err(format!("Repository path is not a directory: {}", path));
-    }
-
-    // We'll validate it's a git repo by trying to run the command
-    // The git command itself will fail if it's not a valid repo
+    log(&format!("Skipping filesystem validation for path: {} (WASM sandbox limitation)", path));
+    
+    // Skip filesystem validation in WASM environment due to sandboxing
+    // Let the git process itself handle path validation
+    log("Repository validation skipped - delegating to git process");
     Ok(())
 }
 
@@ -30,8 +23,9 @@ pub fn start_git_command(state: &mut GitActorState) -> Result<(), String> {
 
     log(&format!("Starting git command: {:?}", state.get_full_command()));
     
-    // Record start time
-    state.start_time = Some(SystemTime::now());
+    // Skip start time recording in WASM environment (SystemTime::now() not available)
+    log("Skipping start time recording (WASM limitation)");
+    state.start_time = None;
 
     // Build the process configuration
     let mut args = vec!["-C".to_string(), state.repository_path.clone()];
@@ -103,10 +97,6 @@ pub fn handle_process_exit(state: &mut GitActorState, pid: u64, exit_code: i32) 
 }
 
 pub fn is_timeout_exceeded(state: &GitActorState) -> bool {
-    if let Some(start_time) = state.start_time {
-        if let Ok(elapsed) = SystemTime::now().duration_since(start_time) {
-            return elapsed.as_secs() > state.timeout_seconds as u64;
-        }
-    }
+    // Timeout checking disabled in WASM environment due to SystemTime limitations
     false
 }

@@ -1,6 +1,6 @@
 name = "git-command-actor"
 version = "0.1.0"
-component = "/Users/colinrozzi/work/actor-registry/git-command-actor/target/wasm32-unknown-unknown/release/git_command_actor.wasm"
+component = "/Users/colinrozzi/work/actor-registry/git-command-actor/./target/wasm32-unknown-unknown/release/git_command_actor.wasm"
 save_chain = true
 init_state = "/Users/colinrozzi/work/actor-registry/git-command-actor/init.json"
 

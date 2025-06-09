@@ -1,5 +1,9 @@
 {
   "repository_path": "/Users/colinrozzi/work/tmp/testgit",
-  "git_args": ["status", "--porcelain"],
+  "git_args": [
+    "commit",
+    "-m",
+    "testingggggg"
+  ],
   "timeout_seconds": 30
 }

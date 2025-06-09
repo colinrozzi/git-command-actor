@@ -68,9 +68,8 @@ impl GitActorState {
     }
 
     pub fn to_result(&self) -> GitCommandResult {
-        let execution_time_ms = self.start_time
-            .and_then(|start| SystemTime::now().duration_since(start).ok())
-            .map(|duration| duration.as_millis() as u64);
+        // Execution time disabled in WASM environment
+        let execution_time_ms = None;
 
         GitCommandResult {
             success: self.exit_code == Some(0) && self.validation_error.is_none(),
