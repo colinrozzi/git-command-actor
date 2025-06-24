@@ -1,9 +1,7 @@
 {
   "repository_path": "/Users/colinrozzi/work/tmp/testgit",
   "git_args": [
-    "commit",
-    "-m",
-    "testingggggg"
+    "status"
   ],
   "timeout_seconds": 30
 }
