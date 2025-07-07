@@ -4,21 +4,15 @@ component = "/Users/colinrozzi/work/actor-registry/git-command-actor/./target/wa
 save_chain = true
 init_state = "/Users/colinrozzi/work/actor-registry/git-command-actor/init.json"
 
-[[handlers]]
+[[handler]]
 type = "runtime"
 
-[handlers.config]
-
-[[handlers]]
+[[handler]]
 type = "process"
-
-[handlers.config]
 max_processes = 1
 max_output_buffer = 1048576
 
-[[handlers]]
+[[handler]]
 type = "timing"
-
-[handlers.config]
 max_sleep_duration = 60000
 min_sleep_duration = 1
