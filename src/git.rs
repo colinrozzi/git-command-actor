@@ -5,8 +5,11 @@ use std::path::Path;
 use std::time::SystemTime;
 
 pub fn validate_repository(path: &str) -> Result<(), String> {
-    log(&format!("Skipping filesystem validation for path: {} (WASM sandbox limitation)", path));
-    
+    log(&format!(
+        "Skipping filesystem validation for path: {} (WASM sandbox limitation)",
+        path
+    ));
+
     // Skip filesystem validation in WASM environment due to sandboxing
     // Let the git process itself handle path validation
     log("Repository validation skipped - delegating to git process");
@@ -21,8 +24,11 @@ pub fn start_git_command(state: &mut GitActorState) -> Result<(), String> {
         return Err(e);
     }
 
-    log(&format!("Starting git command: {:?}", state.get_full_command()));
-    
+    log(&format!(
+        "Starting git command: {:?}",
+        state.get_full_command()
+    ));
+
     // Skip start time recording in WASM environment (SystemTime::now() not available)
     log("Skipping start time recording (WASM limitation)");
     state.start_time = None;
@@ -40,6 +46,7 @@ pub fn start_git_command(state: &mut GitActorState) -> Result<(), String> {
         chunk_size: None,
         stdout_mode: OutputMode::Raw,
         stderr_mode: OutputMode::Raw,
+        execution_timeout: None, // No timeout in WASM
     };
 
     // Spawn the process
@@ -72,8 +79,11 @@ pub fn process_stderr(state: &mut GitActorState, data: &str) {
 pub fn handle_process_exit(state: &mut GitActorState, pid: u64, exit_code: i32) {
     if let Some(active_pid) = state.active_process {
         if active_pid == pid {
-            log(&format!("Git process {} exited with code: {}", pid, exit_code));
-            
+            log(&format!(
+                "Git process {} exited with code: {}",
+                pid, exit_code
+            ));
+
             state.exit_code = Some(exit_code);
             state.active_process = None;
             state.completed = true;
@@ -86,11 +96,17 @@ pub fn handle_process_exit(state: &mut GitActorState, pid: u64, exit_code: i32) 
             }
 
             if !state.stdout_buffer.is_empty() {
-                log(&format!("Final stdout length: {} bytes", state.stdout_buffer.len()));
+                log(&format!(
+                    "Final stdout length: {} bytes",
+                    state.stdout_buffer.len()
+                ));
             }
-            
+
             if !state.stderr_buffer.is_empty() {
-                log(&format!("Final stderr length: {} bytes", state.stderr_buffer.len()));
+                log(&format!(
+                    "Final stderr length: {} bytes",
+                    state.stderr_buffer.len()
+                ));
             }
         }
     }

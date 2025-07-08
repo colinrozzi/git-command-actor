@@ -12,7 +12,10 @@ struct Component;
 impl Guest for Component {
     fn init(state: Option<Vec<u8>>, params: (String,)) -> Result<(Option<Vec<u8>>,), String> {
         let (actor_id,) = params;
-        log(&format!("Initializing git-command-actor with ID: {}", actor_id));
+        log(&format!(
+            "Initializing git-command-actor with ID: {}",
+            actor_id
+        ));
 
         // Parse the initial configuration
         let config: GitCommandConfig = match state {
@@ -43,17 +46,17 @@ impl Guest for Component {
         if actor_state.completed {
             let result = actor_state.to_result();
             log(&format!("Immediate completion with result: {:?}", result));
-            
+
             let shutdown_data = serde_json::to_vec(&result)
                 .map_err(|e| format!("Failed to serialize result: {}", e))?;
-            
+
             let _ = shutdown(Some(&shutdown_data));
         }
 
         // Serialize and return the state
         let state_bytes = serde_json::to_vec(&actor_state)
             .map_err(|e| format!("Failed to serialize state: {}", e))?;
-        
+
         log("Git command actor initialized successfully");
         Ok((Some(state_bytes),))
     }
@@ -79,8 +82,10 @@ impl ProcessHandlers for Component {
         // If we're completed, shutdown with results
         if actor_state.completed {
             let result = actor_state.to_result();
-            log(&format!("Git command completed. Success: {}, Exit code: {:?}", 
-                result.success, result.exit_code));
+            log(&format!(
+                "Git command completed. Success: {}, Exit code: {:?}",
+                result.success, result.exit_code
+            ));
 
             let shutdown_data = serde_json::to_vec(&result)
                 .map_err(|e| format!("Failed to serialize result: {}", e))?;
@@ -118,10 +123,13 @@ impl ProcessHandlers for Component {
 
         // Check for timeout
         if git::is_timeout_exceeded(&actor_state) && !actor_state.completed {
-            log(&format!("Git command timed out after {} seconds", actor_state.timeout_seconds));
+            log(&format!(
+                "Git command timed out after {} seconds",
+                actor_state.timeout_seconds
+            ));
             actor_state.completed = true;
             actor_state.validation_error = Some(format!(
-                "Command timed out after {} seconds", 
+                "Command timed out after {} seconds",
                 actor_state.timeout_seconds
             ));
 

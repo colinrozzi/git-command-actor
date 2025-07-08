@@ -198,7 +198,7 @@ pub mod theater {
         ///
         /// ```wit
         /// // Using the runtime interface in a WIT definition
-        /// use ntwk:theater/runtime;
+        /// use theater:simple/runtime;
         ///
         /// // Using the runtime interface in a Rust implementation
         /// runtime::log("Actor initialized successfully");
@@ -510,6 +510,8 @@ pub mod theater {
                 pub stderr_mode: OutputMode,
                 /// Chunk size for chunked mode (in bytes)
                 pub chunk_size: Option<u32>,
+                /// Execution timeout in seconds (optional)
+                pub execution_timeout: Option<u64>,
             }
             impl ::core::fmt::Debug for ProcessConfig {
                 fn fmt(
@@ -525,6 +527,7 @@ pub mod theater {
                         .field("stdout-mode", &self.stdout_mode)
                         .field("stderr-mode", &self.stderr_mode)
                         .field("chunk-size", &self.chunk_size)
+                        .field("execution-timeout", &self.execution_timeout)
                         .finish()
                 }
             }
@@ -577,6 +580,7 @@ pub mod theater {
                         stdout_mode: stdout_mode0,
                         stderr_mode: stderr_mode0,
                         chunk_size: chunk_size0,
+                        execution_timeout: execution_timeout0,
                     } = config;
                     let vec1 = program0;
                     let ptr1 = vec1.as_ptr().cast::<u8>();
@@ -672,12 +676,16 @@ pub mod theater {
                         Some(e) => (1i32, _rt::as_i32(e)),
                         None => (0i32, 0i32),
                     };
-                    let ptr13 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    let (result13_0, result13_1) = match execution_timeout0 {
+                        Some(e) => (1i32, _rt::as_i64(e)),
+                        None => (0i32, 0i64),
+                    };
+                    let ptr14 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
                     #[link(wasm_import_module = "theater:simple/process")]
                     unsafe extern "C" {
                         #[link_name = "os-spawn"]
-                        fn wit_import14(
+                        fn wit_import15(
                             _: *mut u8,
                             _: usize,
                             _: *mut u8,
@@ -692,11 +700,13 @@ pub mod theater {
                             _: i32,
                             _: i32,
                             _: i32,
+                            _: i32,
+                            _: i64,
                             _: *mut u8,
                         );
                     }
                     #[cfg(not(target_arch = "wasm32"))]
-                    unsafe extern "C" fn wit_import14(
+                    unsafe extern "C" fn wit_import15(
                         _: *mut u8,
                         _: usize,
                         _: *mut u8,
@@ -711,12 +721,14 @@ pub mod theater {
                         _: i32,
                         _: i32,
                         _: i32,
+                        _: i32,
+                        _: i64,
                         _: *mut u8,
                     ) {
                         unreachable!()
                     }
                     unsafe {
-                        wit_import14(
+                        wit_import15(
                             ptr1.cast_mut(),
                             len1,
                             result3,
@@ -731,31 +743,33 @@ pub mod theater {
                             result11,
                             result12_0,
                             result12_1,
-                            ptr13,
+                            result13_0,
+                            result13_1,
+                            ptr14,
                         )
                     };
-                    let l15 = i32::from(*ptr13.add(0).cast::<u8>());
-                    let result20 = match l15 {
+                    let l16 = i32::from(*ptr14.add(0).cast::<u8>());
+                    let result21 = match l16 {
                         0 => {
                             let e = {
-                                let l16 = *ptr13.add(8).cast::<i64>();
-                                l16 as u64
+                                let l17 = *ptr14.add(8).cast::<i64>();
+                                l17 as u64
                             };
                             Ok(e)
                         }
                         1 => {
                             let e = {
-                                let l17 = *ptr13.add(8).cast::<*mut u8>();
-                                let l18 = *ptr13
+                                let l18 = *ptr14.add(8).cast::<*mut u8>();
+                                let l19 = *ptr14
                                     .add(8 + 1 * ::core::mem::size_of::<*const u8>())
                                     .cast::<usize>();
-                                let len19 = l18;
-                                let bytes19 = _rt::Vec::from_raw_parts(
-                                    l17.cast(),
-                                    len19,
-                                    len19,
+                                let len20 = l19;
+                                let bytes20 = _rt::Vec::from_raw_parts(
+                                    l18.cast(),
+                                    len20,
+                                    len20,
                                 );
-                                _rt::string_lift(bytes19)
+                                _rt::string_lift(bytes20)
                             };
                             Err(e)
                         }
@@ -767,7 +781,7 @@ pub mod theater {
                     if layout9.size() != 0 {
                         _rt::alloc::dealloc(result9.cast(), layout9);
                     }
-                    result20
+                    result21
                 }
             }
             #[allow(unused_unsafe, clippy::all)]
@@ -1820,8 +1834,8 @@ pub(crate) use __export_default_impl as export;
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1481] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xcb\x0a\x01A\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1503] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xe1\x0a\x01A\x02\x01\
 A\x0c\x01B\x16\x01s\x04\0\x08actor-id\x03\0\0\x01s\x04\0\x0achannel-id\x03\0\x02\
 \x01p}\x01k\x04\x01r\x02\x08accepted\x7f\x07message\x05\x04\0\x0echannel-accept\x03\
 \0\x06\x01kw\x01r\x03\x0aevent-types\x06parent\x08\x04data\x04\x04\0\x05event\x03\
@@ -1836,25 +1850,25 @@ r\x06paused\x04\0\x0ewit-error-type\x03\0\x12\x01r\x02\x0aerror-type\x13\x04data
 n\x03\0\0\x02\x03\x02\x01\x02\x04\0\x08actor-id\x03\0\x02\x01@\x01\x03msgs\x01\0\
 \x04\0\x03log\x01\x04\x01@\0\0\x01\x04\0\x09get-chain\x01\x05\x01p}\x01k\x06\x01\
 j\0\x01s\x01@\x01\x04data\x07\0\x08\x04\0\x08shutdown\x01\x09\x03\0\x16theater:s\
-imple/runtime\x05\x03\x01B\x1b\x01q\x04\x03raw\0\0\x0cline-by-line\0\0\x04json\0\
+imple/runtime\x05\x03\x01B\x1c\x01q\x04\x03raw\0\0\x0cline-by-line\0\0\x04json\0\
 \0\x07chunked\0\0\x04\0\x0boutput-mode\x03\0\0\x01ps\x01ks\x01o\x02ss\x01p\x04\x01\
-ky\x01r\x08\x07programs\x04args\x02\x03cwd\x03\x03env\x05\x0bbuffer-sizey\x0bstd\
-out-mode\x01\x0bstderr-mode\x01\x0achunk-size\x06\x04\0\x0eprocess-config\x03\0\x07\
-\x01kz\x01r\x04\x03pidw\x07running\x7f\x09exit-code\x09\x0astart-timew\x04\0\x0e\
-process-status\x03\0\x0a\x01j\x01w\x01s\x01@\x01\x06config\x08\0\x0c\x04\0\x08os\
--spawn\x01\x0d\x01p}\x01j\x01y\x01s\x01@\x02\x03pidw\x04data\x0e\0\x0f\x04\0\x0e\
-os-write-stdin\x01\x10\x01j\x01\x0b\x01s\x01@\x01\x03pidw\0\x11\x04\0\x09os-stat\
-us\x01\x12\x01j\0\x01s\x01@\x02\x03pidw\x06signaly\0\x13\x04\0\x09os-signal\x01\x14\
-\x01@\x01\x03pidw\0\x13\x04\0\x07os-kill\x01\x15\x03\0\x16theater:simple/process\
-\x05\x04\x01B\x07\x01p}\x01k\0\x01o\x01s\x01o\x01\x01\x01j\x01\x03\x01s\x01@\x02\
-\x05state\x01\x06params\x02\0\x04\x04\0\x04init\x01\x05\x04\0\x14theater:simple/\
-actor\x05\x05\x01B\x0b\x01p}\x01k\0\x01o\x02w\0\x01o\x01\x01\x01j\x01\x03\x01s\x01\
-@\x02\x05state\x01\x06params\x02\0\x04\x04\0\x0dhandle-stdout\x01\x05\x04\0\x0dh\
-andle-stderr\x01\x05\x01o\x02wz\x01@\x02\x05state\x01\x06params\x06\0\x04\x04\0\x0b\
-handle-exit\x01\x07\x04\0\x1ftheater:simple/process-handlers\x05\x06\x04\0$colin\
-rozzi:git-command-actor/default\x04\0\x0b\x0d\x01\0\x07default\x03\0\0\0G\x09pro\
-ducers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x06\
-0.41.0";
+ky\x01kw\x01r\x09\x07programs\x04args\x02\x03cwd\x03\x03env\x05\x0bbuffer-sizey\x0b\
+stdout-mode\x01\x0bstderr-mode\x01\x0achunk-size\x06\x11execution-timeout\x07\x04\
+\0\x0eprocess-config\x03\0\x08\x01kz\x01r\x04\x03pidw\x07running\x7f\x09exit-cod\
+e\x0a\x0astart-timew\x04\0\x0eprocess-status\x03\0\x0b\x01j\x01w\x01s\x01@\x01\x06\
+config\x09\0\x0d\x04\0\x08os-spawn\x01\x0e\x01p}\x01j\x01y\x01s\x01@\x02\x03pidw\
+\x04data\x0f\0\x10\x04\0\x0eos-write-stdin\x01\x11\x01j\x01\x0c\x01s\x01@\x01\x03\
+pidw\0\x12\x04\0\x09os-status\x01\x13\x01j\0\x01s\x01@\x02\x03pidw\x06signaly\0\x14\
+\x04\0\x09os-signal\x01\x15\x01@\x01\x03pidw\0\x14\x04\0\x07os-kill\x01\x16\x03\0\
+\x16theater:simple/process\x05\x04\x01B\x07\x01p}\x01k\0\x01o\x01s\x01o\x01\x01\x01\
+j\x01\x03\x01s\x01@\x02\x05state\x01\x06params\x02\0\x04\x04\0\x04init\x01\x05\x04\
+\0\x14theater:simple/actor\x05\x05\x01B\x0b\x01p}\x01k\0\x01o\x02w\0\x01o\x01\x01\
+\x01j\x01\x03\x01s\x01@\x02\x05state\x01\x06params\x02\0\x04\x04\0\x0dhandle-std\
+out\x01\x05\x04\0\x0dhandle-stderr\x01\x05\x01o\x02wz\x01@\x02\x05state\x01\x06p\
+arams\x06\0\x04\x04\0\x0bhandle-exit\x01\x07\x04\0\x1ftheater:simple/process-han\
+dlers\x05\x06\x04\0$colinrozzi:git-command-actor/default\x04\0\x0b\x0d\x01\0\x07\
+default\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.22\
+7.1\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
